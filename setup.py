@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2023, Enrico Development Team.
+# Copyright (c) 2026, Enrico Development Team.
 # Distributed under the LGPLv2.1+ License.
 from codecs import open as openc
 import pathlib

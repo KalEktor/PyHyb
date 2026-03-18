@@ -21,7 +21,7 @@ Run unit tests (requires pytest):
 
 cd tests
 
-pytest --cov=pydec *py
+pytest
 
 
 

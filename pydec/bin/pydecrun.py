@@ -35,10 +35,14 @@ def parse_input_file():  # pragma: no cover
     parser.add_argument('-i', '--input',
                         help=f'Location of {PROGRAM_NAME} input file',
                         required=False, default=None)
+    parser.add_argument('-f', '--fuckers',
+                        help='Randomly insult a user',
+                        required=False, default='Fuck off')
     args_dict = vars(parser.parse_args())
     input_file = args_dict['input']
+    insult = args_dict['fuckers']
 
-    return input_file
+    return input_file, insult
 
 
 def bye_world():
@@ -56,7 +60,7 @@ def entry_point():  # pragma: no cover
 
     """
     hello_world()
-    input_file = parse_input_file()
+    input_file, _ = parse_input_file()
     if input_file:
         pydec_main(input_file)
     bye_world()

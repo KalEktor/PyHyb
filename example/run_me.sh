@@ -6,10 +6,10 @@
 #
 # "python exempler.py"
 #
-# thus using PyDec as a library.
+# thus using PyHyb as a library.
 #
 
 unzip testfiles.zip
-pydec -i test.json
+pyhyb -i test.json
 
 rm *.f *.s

@@ -1,5 +1,5 @@
-{"Input": {"file_segments": ["testfile_a.s", "testfile_b.s"], 
-	   "file_functions": ["testfile_a.f", "testfile_b.f"]},
+{"Input": {"file_segments": ["material_xyz.s", "substrate_cif.s"], 
+	   "file_functions": ["material_xyz.f", "substrate_cif.f"]},
  "Main": {"tasks": ["local_mean"],
 	  "idx_tasks": [[0, 1]],
 	  "cross_tasks": ["overlap", "person"],

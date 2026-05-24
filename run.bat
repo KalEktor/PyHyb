@@ -1,0 +1,87 @@
+@echo off
+rem PyHyB Launcher Bootstrapper for Windows
+
+echo ============================================================
+echo              PyHyB Environment Setup ^& Bootstrapper
+echo ============================================================
+
+rem Check for python
+where python >nul 2>nul
+if %errorlevel% neq 0 (
+    echo Python is not detected on your system.
+    echo Attempting automatic installation via Windows Package Manager (winget)...
+    
+    where winget >nul 2>nul
+    if %errorlevel% eq 0 (
+        winget install --id Python.Python.3.11 --exact --silent --accept-source-agreements --accept-package-agreements
+        if %errorlevel% eq 0 (
+            echo Python installed successfully via winget!
+            goto :refresh_path
+        )
+    )
+    
+    echo winget failed or not found. Downloading Python 3.11 web installer...
+    curl -L -o "%TEMP%\python_installer.exe" https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+    if %errorlevel% neq 0 (
+        echo Error: Failed to download Python installer automatically.
+        echo Please download and install Python 3.9+ manually from https://www.python.org/
+        pause
+        exit /b 1
+    )
+    
+    echo Running Python silent installer...
+    start /wait "" "%TEMP%\python_installer.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0
+    del "%TEMP%\python_installer.exe" >nul 2>nul
+    
+    :refresh_path
+    echo Refreshing environment path...
+    rem Retrieve updated PATH from registry so the current session can find the new python executable
+    for /f "tokens=2*" %%a in ('reg query "HKCU\Environment" /v PATH 2^>nul') do set "PATH=%%b"
+    for /f "tokens=2*" %%a in ('reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v PATH 2^>nul') do set "PATH=%%b;%PATH%"
+)
+
+rem Double check python is now available
+where python >nul 2>nul
+if %errorlevel% neq 0 (
+    echo Error: Python could not be installed automatically.
+    echo Please install Python 3.9+ manually and make sure to check "Add Python to PATH" in the installer.
+    pause
+    exit /b 1
+)
+
+rem Create virtual environment if it does not exist
+if not exist .venv (
+    echo Creating virtual environment '.venv'...
+    python -m venv .venv
+    if %errorlevel% neq 0 (
+        echo Error: Failed to create virtual environment.
+        pause
+        exit /b 1
+    )
+)
+
+rem Activate virtual environment
+call .venv\Scripts\activate.bat
+if %errorlevel% neq 0 (
+    echo Error: Failed to activate virtual environment.
+    pause
+    exit /b 1
+)
+
+rem Check if environment is already installed to avoid reinstall overhead
+if not exist .venv\.initialized (
+    echo Installing dependencies ^& packages (first-time setup)...
+    python -m pip install --upgrade pip
+    python -m pip install -e .
+    if %errorlevel% eq 0 (
+        echo. > .venv\.initialized
+        echo Environment initialized successfully!
+    ) else (
+        echo Error: Dependency installation failed.
+        pause
+        exit /b 1
+    )
+)
+
+echo Starting PyHyB Launcher Menu...
+python launcher.py

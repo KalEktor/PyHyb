@@ -5,12 +5,16 @@
 Test program structure.
 
 """
+import os
+import pathlib
 import unittest
 from io import StringIO
 from unittest.mock import patch
-from pydec.core.runner import Geni
-from pydec.core.main import pydec_main
-from pydec.bin.pydecrun import hello_world, bye_world
+from pyhyb.core.runner import Geni
+from pyhyb.core.main import pyhyb_main
+from pyhyb.bin.pyhybrun import hello_world, bye_world
+
+TEST_FILES_DIR = pathlib.Path(__file__).parent / 'test_files'
 
 
 class StructureTesting(unittest.TestCase):
@@ -40,14 +44,19 @@ class StructureTesting(unittest.TestCase):
             general.cheers()
         self.assertIn('D-O-N-E', stdout.getvalue().strip())
 
-    def test_pydec_main(self):
+    def test_pyhyb_main(self):
         """
         Test main function.
 
         """
-        with patch('sys.stdout', new=StringIO()) as stdout:
-            pydec_main(input_file='test_files/test.json')
-        self.assertIn('D-O-N-E', stdout.getvalue().strip())
+        old_cwd = os.getcwd()
+        os.chdir(str(TEST_FILES_DIR.parent))
+        try:
+            with patch('sys.stdout', new=StringIO()) as stdout:
+                pyhyb_main(input_file='test_files/test.json')
+            self.assertIn('D-O-N-E', stdout.getvalue().strip())
+        finally:
+            os.chdir(old_cwd)
 
     def test_polite_functions(self):
         """
@@ -56,7 +65,7 @@ class StructureTesting(unittest.TestCase):
         """
         with patch('sys.stdout', new=StringIO()) as stdout:
             hello_world()
-        self.assertIn('ision', stdout.getvalue().strip())
+        self.assertIn('rid', stdout.getvalue().strip())
         with patch('sys.stdout', new=StringIO()) as stdout:
             bye_world()
         self.assertIn('execution', stdout.getvalue().strip())

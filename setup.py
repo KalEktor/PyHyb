@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2026, Enrico Development Team.
 # Distributed under the LGPLv2.1+ License.
+"""
+PyHyB Setup Script
+------------------
+Configuration for packaging and installing PyHyB.
+"""
 from codecs import open as openc
 import pathlib
 from setuptools import setup, find_namespace_packages
@@ -13,22 +18,24 @@ def get_requirements():
     filename = here.joinpath('requirements.txt')
     with openc(filename, encoding='utf-8') as fileh:
         for lines in fileh:
-            package = lines.split('>=')[1].strip()
-            requirements.append(lines.strip())
+            line = lines.strip()
+            if not line:
+                continue
+            requirements.append(line)
     return requirements
 
 
 setup(
-    name='pydec',
+    name='pyhyb',
     version='0.0.9.dev0',
     description='A basic simulation package',
-    author='Enrico Riccardi',
-    author_email='enrico.riccardi@uis.no',
+    author='Konstantinos Alektoridis',
+    author_email='konstantinos.alektoridis@uis.no',
     license='LGPLv2.1+',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
-        'Intended Audience :: Python Programming Students',
+        'Intended Audience :: Materials Physicists/Engineers',
         ('License :: OSI Approved :: '
          'GNU Lesser General Public License v2 or later (LGPLv2+)'),
         'Natural Language :: English',
@@ -36,12 +43,12 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Topic :: Scientific/Engineering :: Decision Analysis',
     ],
-    keywords='Decisions in Python',
+    keywords='Constructing 2D Materials',
     packages=find_namespace_packages(),
     install_requires=get_requirements(),
     entry_points={
-        'console_scripts': [
-            'pydec = pydec.bin.pydecrun:entry_point',
-        ]
+        "console_scripts": [
+            "pyhyb=pyhyb.bin.pyhybrun:entry_point",
+        ],
     },
-)
+    )

@@ -5,11 +5,14 @@
 Test program operational functions for single and cross segments or functions.
 
 """
+import pathlib
 import unittest
 import numpy as np
-from pydec.inout.inout import read_data_file
-from pydec.tools.tools import check_segment_consistency, local_mean
-from pydec.tools.cross_tools import segment_overlap, person, vanilla_person
+from pyhyb.inout.inout import read_data_file
+from pyhyb.tools.tools import check_segment_consistency, local_mean
+from pyhyb.tools.cross_tools import segment_overlap, person, vanilla_person
+
+TEST_FILES_DIR = pathlib.Path(__file__).parent / 'test_files'
 
 
 class ToolsTesting(unittest.TestCase):
@@ -22,8 +25,8 @@ class ToolsTesting(unittest.TestCase):
         Test read segment consistency.
 
         """
-        source_file_not_ok = 'test_files/segment_not_ok.s'
-        source_file_ok = 'test_files/segment_ok.s'
+        source_file_not_ok = str(TEST_FILES_DIR / 'segment_not_ok.s')
+        source_file_ok = str(TEST_FILES_DIR / 'segment_ok.s')
         read_not_ok = read_data_file(source_file_not_ok)
         read_ok = read_data_file(source_file_ok)
 

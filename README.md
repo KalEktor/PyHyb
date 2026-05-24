@@ -5,12 +5,39 @@ PyHyB is a high-performance Python package designed to construct complex hybrid 
 ---
 
 ## 📖 Table of Contents
-1. [⚡ Quick-Start (1-Click Universal Launcher)](#quick-start-1-click-universal-launcher)
-2. [🖥️ Application Interfaces](#application-interfaces)
-3. [🛠️ Manual Installation & DFTB+ Setup](#manual-installation--dftb-setup)
-4. [🧠 Underlying Workflow Operations](#underlying-workflow-operations)
-5. [🚀 Verification Examples](#verification-examples)
-6. [🧪 Running Unit Tests & Quality Controls](#running-unit-tests--quality-controls)
+1. [📥 Download & Installation](#-download--installation)
+2. [⚡ Quick-Start (1-Click Universal Launcher)](#-quick-start-1-click-universal-launcher)
+3. [🖥️ Application Interfaces](#-application-interfaces)
+4. [🛠️ Manual Installation & DFTB+ Setup](#-manual-installation--dftb-setup)
+5. [🧠 Underlying Workflow Operations](#-underlying-workflow-operations)
+6. [🚀 Verification Examples](#-verification-examples)
+7. [🧪 Running Unit Tests & Quality Controls](#-running-unit-tests--quality-controls)
+
+---
+
+## 📥 Download & Installation
+
+You can download and install PyHyB in one of three ways:
+
+### 1. Clone the Git Repository (Recommended for Developers)
+To download the complete source code, test suites, and benchmark examples, clone the repository directly in your terminal:
+```bash
+git clone https://github.com/KalEktor/PyHyb.git
+cd PyHyb
+```
+
+### 2. Download as a ZIP File (For Non-Git Users)
+If you do not have Git installed on your computer:
+1. Navigate to the GitHub repository: [github.com/KalEktor/PyHyb](https://github.com/KalEktor/PyHyb).
+2. Click the green **Code** button at the top-right of the files panel.
+3. Select **Download ZIP** from the dropdown menu.
+4. Extract the downloaded ZIP archive on your computer and open a terminal inside the extracted directory.
+
+### 3. Install Directly via `pip` (For Library & CLI Users)
+If you only need to use the global `pyhyb` command-line executable or import the hybrid builder tools inside your own Python library scripts:
+```bash
+pip install git+https://github.com/KalEktor/PyHyb.git
+```
 
 ---
 

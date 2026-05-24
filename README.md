@@ -59,6 +59,9 @@ PyHyB features an **automated, cross-platform bootstrapper** that checks for Pyt
    run.bat
    ```
 
+> [!NOTE]
+   > **No Python? No problem!** Double-clicking `run.bat` (Windows) or running `./run.sh` (macOS/Linux) will automatically detect if a working Python 3 installation is missing, download the official installer, configure your system PATH, and set up your virtual environment cleanly in one click. (On Windows, this automatically bypasses the dummy Microsoft Store execution alias to ensure a real Python installation is completed).
+
 Once launched, an interactive terminal menu will let you choose to:
 * **Option 1**: Start the Interactive 3D Web GUI in your browser. 🚀
 * **Option 2**: Start the Custom Interactive Hybrid Builder. 🔨

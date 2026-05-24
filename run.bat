@@ -8,10 +8,10 @@ echo ============================================================
 echo              PyHyB Environment Setup ^& Bootstrapper
 echo ============================================================
 
-rem Check for python
-where python >nul 2>nul
+rem Check for a working Python installation (ignoring Microsoft Store dummy execution aliases)
+python -c "import sys" >nul 2>nul
 if %errorlevel% neq 0 (
-    echo Python is not detected on your system.
+    echo Python is not detected or is not fully configured on your system.
     echo Attempting automatic installation via Windows Package Manager (winget)...
 
     where winget >nul 2>nul
@@ -43,10 +43,10 @@ if %errorlevel% neq 0 (
     for /f "tokens=2*" %%a in ('reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v PATH 2^>nul') do set "PATH=%%b;%PATH%"
 )
 
-rem Double check python is now available
-where python >nul 2>nul
+rem Double check python is now available and fully functional
+python -c "import sys" >nul 2>nul
 if %errorlevel% neq 0 (
-    echo Error: Python could not be installed automatically.
+    echo Error: Python could not be installed automatically or Microsoft Store Alias is blocking.
     echo Please install Python 3.9+ manually and make sure to check "Add Python to PATH" in the installer.
     pause
     exit /b 1

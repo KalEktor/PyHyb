@@ -21,4 +21,4 @@ jobs:
         pip install -e .
     - name: Analysing the code with pylint
       run: |
-        pylint pyhyb app.py launcher.py setup.py tests/
+        PYTHONPATH=. pylint pyhyb app.py launcher.py setup.py tests/

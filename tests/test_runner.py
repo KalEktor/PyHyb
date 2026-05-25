@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=too-many-arguments,too-many-positional-arguments,unused-argument,unused-variable
 """
 Unit Tests for PyHyB Workflow Runner & Structure Optimizer
 ----------------------------------------------------------
 """
 
 import unittest
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 from ase import Atoms
-from pyhyb.core.hybrid_runner import HybridWorkflowRunner, InputValidationError
+from pyhyb.core.hybrid_runner import HybridWorkflowRunner
 from pyhyb.tools.optimizer import StructureOptimizer
 
 
@@ -44,7 +44,9 @@ class TestRunnerAndOptimizer(unittest.TestCase):
     @patch('pyhyb.tools.optimizer.BFGS')
     @patch('pyhyb.tools.optimizer.Dftb')
     @patch('pyhyb.tools.optimizer.Atoms.get_potential_energy')
-    def test_optimizer_relaxation_pipeline(self, mock_energy, mock_dftb, mock_bfgs, mock_exists, mock_env):
+    def test_optimizer_relaxation_pipeline(
+        self, mock_energy, mock_dftb, mock_bfgs, mock_exists, mock_env
+    ):
         """Verify StructureOptimizer attaches Dftb calculator and runs BFGS."""
         mock_energy.side_effect = [-100.0, -105.0] # Initial vs final energy
         mock_bfgs_instance = MagicMock()

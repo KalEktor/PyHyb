@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=protected-access,unused-argument,no-member,too-many-locals
 """
 Unit Tests for PyHyB HybridBuilder
 ----------------------------------
@@ -7,7 +8,7 @@ Thoroughly tests the 3D material construction algorithms in builder.py.
 
 import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import numpy as np
 from ase import Atoms
 from pyhyb.tools.builder import (
@@ -73,7 +74,10 @@ class TestBuilder(unittest.TestCase):
             builder._read_structures()
 
         # 2. Empty substrate
-        mock_read.side_effect = [Atoms("H2O", positions=[[0, 0, 0], [0, 0, 1], [0, 1, 0]]), Atoms()]
+        mock_read.side_effect = [
+            Atoms("H2O", positions=[[0, 0, 0], [0, 0, 1], [0, 1, 0]]),
+            Atoms()
+        ]
         with self.assertRaises(StructureError):
             builder._read_structures()
 
@@ -152,7 +156,10 @@ class TestBuilder(unittest.TestCase):
         builder_center = HybridBuilder(config_center)
         combined_center = builder_center.build()
         placed_mol_c = combined_center[1:]
-        z_center = 0.5 * (placed_mol_c.positions[:, 2].max() + placed_mol_c.positions[:, 2].min())
+        z_center = 0.5 * (
+            placed_mol_c.positions[:, 2].max() +
+            placed_mol_c.positions[:, 2].min()
+        )
         self.assertAlmostEqual(z_center, 5.0)
 
         # 2. Placement = "surface" with distance = 3.0
@@ -207,7 +214,7 @@ class TestBuilder(unittest.TestCase):
         # Molecule placed high up (near Z=9.5)
         material = Atoms("H", positions=[[5.0, 5.0, 9.5]])
 
-        # Placement center will position it at Z=5.0. Let's use placement "surface" with distance = 9.5
+        # Center places at Z=5.0. Use surface with distance=9.5
         config = HybridConfig(
             material_path=Path("molecule.xyz"),
             substrate_path=Path("substrate.cif"),
@@ -221,7 +228,8 @@ class TestBuilder(unittest.TestCase):
         combined = builder.build()
 
         # Highest atom is at Z = 9.5. This exceeds cell_z - 5.0 (which is 5.0).
-        # Vacuum expansion should resize the Z lattice vector (cell[2, 2]) to max_z + 10.0 = 9.5 + 10.0 = 19.5
+        # Vacuum expansion should resize the Z lattice vector (cell[2, 2])
+        # to max_z + 10.0 = 9.5 + 10.0 = 19.5
         self.assertAlmostEqual(combined.cell[2, 2], 19.5)
 
     @patch('pyhyb.tools.builder.Path.is_file', return_value=True)
@@ -265,7 +273,7 @@ class TestBuilder(unittest.TestCase):
         c1 = ring1.mean(axis=0)
         c2 = ring2.mean(axis=0)
 
-        # The axis vector should now be perfectly parallel to the Cartesian X-axis [1.0, 0.0, 0.0]
+        # The axis vector should now be perfectly parallel to Cartesian X-axis
         axis = c1 - c2 if c1[2] > c2[2] else c2 - c1
         axis /= np.linalg.norm(axis)
 

@@ -161,15 +161,23 @@ The builder executes the building sequence through the following physical workfl
 
 ```mermaid
 graph TD
-    A["Read XYZ Molecule & CIF Substrate"] --> B["Wrap Substrate Atoms into Unit Cell"]
-    B --> C{"Does Molecule Fit in Cell?"}
-    C -->|No| D["Auto-Rotate/Tilt to Fit"]
-    C -->|Yes| E["Center Molecule in fractional X/Y space"]
-    D --> E
-    E --> F["Place Molecule in target Z Height"]
-    F --> G["Run Z-push Collision Avoidance Check"]
-    G --> H["Check Boundaries and Expand Z-vacuum if needed"]
-    H --> I["Write CIF, XYZ, and GEN Outputs"]
+    A["Read XYZ Molecule & CIF Substrate"] --> B["Substrate Z-Unwrapping Check"]
+    B --> C["Wrap Substrate Atoms into X/Y unit-cell"]
+    C --> D{"Is Molecule Cucurbituril?"}
+    D -->|Yes| E["Align Central Axis to Z-axis (Perfect Horizontal orientation)"]
+    D -->|No| F["Apply User-Specified Rotation (Euler angles)"]
+    E --> F
+    F --> G{"Does Molecule Fit in Cell?"}
+    G -->|No| H["Auto-Rotate/Tilt to Fit (In-Plane Yaw & Out-of-Plane Pitch/Roll)"]
+    G -->|Yes| I["Center Bounding Box in fractional X/Y space"]
+    H --> I
+    I --> J["Position Molecule vertically (Surface peak vs Cell Z-midpoint)"]
+    J --> K["Iterative Z-push Collision Avoidance (cdist threshold check)"]
+    K --> L["Combine Structures & Dynamic Z-Vacuum Expansion"]
+    L --> M{"DFTB+ Optimization Requested?"}
+    M -->|Yes| N["BFGS Geometry Relaxation (Slater-Koster energy minimization)"]
+    M -->|No| O["Write CIF, XYZ, and GEN Outputs (Pre-relaxed / Optimized)"]
+    N --> O
 ```
 
 ---

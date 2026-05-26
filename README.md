@@ -163,10 +163,7 @@ The builder executes the building sequence through the following physical workfl
 graph TD
     A["Read XYZ Molecule & CIF Substrate"] --> B["Substrate Z-Unwrapping Check"]
     B --> C["Wrap Substrate Atoms into X/Y unit-cell"]
-    C --> D{"Is Molecule Cucurbituril?"}
-    D -->|Yes| E["Align Central Axis to Z-axis (Perfect Horizontal orientation)"]
-    D -->|No| F["Apply User-Specified Rotation (Euler angles)"]
-    E --> F
+    C --> F["Apply User-Specified Rotation (Euler angles)"]
     F --> G{"Does Molecule Fit in Cell?"}
     G -->|No| H["Auto-Rotate/Tilt to Fit (In-Plane Yaw & Out-of-Plane Pitch/Roll)"]
     G -->|Yes| I["Center Bounding Box in fractional X/Y space"]

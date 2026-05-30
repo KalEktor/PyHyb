@@ -54,3 +54,4 @@ tests/results.pydec
 
 # Log files
 *.log
+output_dir/

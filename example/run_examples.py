@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-PyHyB Examples Runner
----------------------
-This script executes two separate independent examples to verify
-the hybrid material building capability of PyHyB:
+PyHyB Examples Runner.
 
-1. Depositing glycine (amino acid) on a 7x7 graphene unit cell.
-2. Depositing a 15-crown-5 macrocycle (crown ether) on a 7x7 graphene unit cell.
+Executes three independent examples to verify the hybrid
+material building capability of PyHyB:
+
+1. Depositing glycine on a 7x7 graphene unit cell.
+2. Depositing a 15-crown-5 macrocycle on graphene.
+3. Depositing cucurbituril on graphene oxide.
 """
 from pathlib import Path
 import sys
@@ -19,71 +20,91 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from pyhyb.core.runner import run_build_hybrid
 
 
-def main():
-    """
-    Executes the glycine and crown ether on graphene hybrid construction examples.
-    """
-    print("==================================================")
-    print("            PyHyB Examples Runner")
-    print("==================================================")
+DATA_DIR = PROJECT_ROOT / "example" / "data"
+OUT_DIR = PROJECT_ROOT / "example" / "output"
 
-    glycine_path = PROJECT_ROOT / "example" / "data" / "glycine.xyz"
-    crown_path = PROJECT_ROOT / "example" / "data" / "crown_ether.xyz"
-    cucurbit_path = PROJECT_ROOT / "example" / "data" / "cucurbituril.xyz"
-    graphene_path = PROJECT_ROOT / "example" / "data" / "graphene_7x7.cif"
-    graphene_oxide_path = PROJECT_ROOT / "example" / "data" / "graphene_oxide.cif"
+
+def main():
+    """Run all three benchmark examples."""
+    print("=" * 50)
+    print("            PyHyB Examples Runner")
+    print("=" * 50)
+
+    glycine = DATA_DIR / "glycine.xyz"
+    crown = DATA_DIR / "crown_ether.xyz"
+    cucurbit = DATA_DIR / "cucurbituril.xyz"
+    graphene = DATA_DIR / "graphene_7x7.cif"
+    graphene_oxide = DATA_DIR / "graphene_oxide.cif"
 
     # 1. Glycine on 7x7 Graphene
-    print("\n--- Running Example 1: Glycine on 7x7 Graphene ---")
+    print(
+        "\n--- Example 1: Glycine on Graphene ---"
+    )
     try:
         msg1 = run_build_hybrid(
-            material_path=str(glycine_path),
-            substrate_path=str(graphene_path),
-            output_dir=str(PROJECT_ROOT / "example" / "output" / "example1_glycine"),
+            material_path=str(glycine),
+            substrate_path=str(graphene),
+            output_dir=str(
+                OUT_DIR / "example1_glycine"
+            ),
             placement="surface",
             distance=3.0,
-            collision_threshold=1.5
+            collision_threshold=1.5,
         )
         print("Example 1 Completed Successfully!")
         print(msg1)
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        print(f"Example 1 Failed: {e}")
+    # pylint: disable=broad-exception-caught
+    except Exception as exc:
+        print(f"Example 1 Failed: {exc}")
 
     # 2. Crown Ether on 7x7 Graphene
-    print("\n--- Running Example 2: Crown Ether on 7x7 Graphene ---")
+    print(
+        "\n--- Example 2: Crown Ether on Graphene ---"
+    )
     try:
         msg2 = run_build_hybrid(
-            material_path=str(crown_path),
-            substrate_path=str(graphene_path),
-            output_dir=str(PROJECT_ROOT / "example" / "output" / "example2_crown_ether"),
+            material_path=str(crown),
+            substrate_path=str(graphene),
+            output_dir=str(
+                OUT_DIR / "example2_crown_ether"
+            ),
             placement="surface",
             distance=3.0,
-            collision_threshold=1.5
+            collision_threshold=1.5,
         )
         print("Example 2 Completed Successfully!")
         print(msg2)
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        print(f"Example 2 Failed: {e}")
+    # pylint: disable=broad-exception-caught
+    except Exception as exc:
+        print(f"Example 2 Failed: {exc}")
 
-    # 3. Cucurbituril on 7x7 Graphene Oxide
-    print("\n--- Running Example 3: Cucurbituril on Graphene Oxide ---")
+    # 3. Cucurbituril on Graphene Oxide
+    print(
+        "\n--- Example 3: Cucurbituril on GO ---"
+    )
     try:
         msg3 = run_build_hybrid(
-            material_path=str(cucurbit_path),
-            substrate_path=str(graphene_oxide_path),
-            output_dir=str(PROJECT_ROOT / "example" / "output" / "example3_cucurbituril"),
+            material_path=str(cucurbit),
+            substrate_path=str(graphene_oxide),
+            output_dir=str(
+                OUT_DIR / "example3_cucurbituril"
+            ),
             placement="surface",
             distance=3.0,
-            collision_threshold=1.5
+            collision_threshold=1.5,
         )
         print("Example 3 Completed Successfully!")
         print(msg3)
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        print(f"Example 3 Failed: {e}")
+    # pylint: disable=broad-exception-caught
+    except Exception as exc:
+        print(f"Example 3 Failed: {exc}")
 
-    print("\n==================================================")
-    print("All examples executed. View outputs in example/output/ folder.")
-    print("==================================================")
+    print("\n" + "=" * 50)
+    print(
+        "All examples executed. View outputs in "
+        "example/output/ folder."
+    )
+    print("=" * 50)
 
 
 if __name__ == '__main__':

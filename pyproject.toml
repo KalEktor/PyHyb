@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools >= 68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyhyb"
+version = "0.0.9.dev0"
+description = "High-performance hybrid molecular/substrate structure builder"
+readme = "README.md"
+license = {text = "LGPLv2.1+"}
+requires-python = ">= 3.10"
+authors = [
+    { name = "Konstantinos Alektoridis", email = "konstantinos.alektoridis@uis.no" },
+]
+keywords = [
+    "hybrid-materials",
+    "molecular-deposition",
+    "computational-chemistry",
+    "ase",
+    "surface-science",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy >= 1.17.0",
+    "ase >= 3.22.0",
+    "scipy >= 1.7.0",
+    "streamlit >= 1.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pylint",
+    "pycodestyle",
+    "pytest",
+    "pytest-cov",
+]
+
+[project.scripts]
+pyhyb = "pyhyb.bin.pyhybrun:entry_point"
+
+[project.urls]
+Homepage = "https://github.com/KalEktor/PyHyb"
+Repository = "https://github.com/KalEktor/PyHyb"
+Issues = "https://github.com/KalEktor/PyHyb/issues"
+
+[tool.setuptools.packages.find]
+include = ["pyhyb*"]
+
+[tool.setuptools.package-data]
+pyhyb = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.pycodestyle]
+max-line-length = 79
+
+[tool.pylint.messages_control]
+disable = ["too-many-instance-attributes"]

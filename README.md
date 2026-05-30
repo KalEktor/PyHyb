@@ -1,220 +1,254 @@
-# PyHyB: Hybrid Material Builder
+# PyHyB — Hybrid Material Builder
 
-PyHyB is a high-performance Python package designed to construct complex hybrid configurations by combining molecular structures (`.xyz`) with periodic substrates (`.cif`) using the Atomic Simulation Environment (ASE). It includes robust algorithms for unit-cell wrapping, molecule centering, out-of-plane tilting, collision avoidance, Z-axis cell expansion, and optional DFTB+ geometry relaxation.
+[![CI](https://github.com/KalEktor/PyHyb/actions/workflows/ci.yml/badge.svg)](https://github.com/KalEktor/PyHyb/actions/workflows/ci.yml)
+[![Pylint Score](https://img.shields.io/badge/pylint-10.00/10-brightgreen)](https://github.com/KalEktor/PyHyb)
+[![pycodestyle](https://img.shields.io/badge/pycodestyle-passing-brightgreen)](https://github.com/KalEktor/PyHyb)
+[![License](https://img.shields.io/badge/license-LGPLv2.1%2B-blue)](LICENSE)
 
----
-
-## 📖 Table of Contents
-1. [📥 Download & Installation](#-download--installation)
-2. [⚡ Quick-Start (1-Click Universal Launcher)](#-quick-start-1-click-universal-launcher)
-3. [🖥️ Application Interfaces](#-application-interfaces)
-4. [🛠️ Manual Installation & DFTB+ Setup](#-manual-installation--dftb-setup)
-5. [🧠 Underlying Workflow Operations](#-underlying-workflow-operations)
-6. [🚀 Verification Examples](#-verification-examples)
-7. [🧪 Running Unit Tests & Quality Controls](#-running-unit-tests--quality-controls)
+**PyHyB** is a high-performance Python package for constructing hybrid molecular/substrate configurations using the [Atomic Simulation Environment (ASE)](https://wiki.fysik.dtu.dk/ase/). It automates the difficult process of placing molecular structures on periodic substrates with collision avoidance, auto-tilt fitting, and optional geometry optimisation via DFTB+.
 
 ---
 
-## 📥 Download & Installation
+## ✨ Key Features
 
-You can download and install PyHyB in one of three ways:
+- **3D Material Construction** — Deposit any `.xyz` molecule on any periodic `.cif` substrate
+- **Collision Avoidance** — Iterative Z-push algorithm to prevent atomic overlaps
+- **Auto-Tilt Fitting** — Automatic yaw/pitch/roll to fit oversized molecules into unit cells
+- **Cucurbituril Channel Alignment** — Specialised alignment for macrocyclic host molecules
+- **Build Manifest** — Full JSON provenance for every generated structure (inputs, parameters, git SHA, timestamp)
+- **Interactive Web GUI** — Beautiful Streamlit dashboard with 3D py3Dmol viewer
+- **CLI & Menu Launcher** — Multiple entry points for different workflows
+- **Geometry Optimisation** — Optional DFTB+ relaxation via ASE's BFGS optimiser
 
-### 1. Clone the Git Repository (Recommended for Developers)
-To download the complete source code, test suites, and benchmark examples, clone the repository directly in your terminal:
-```bash
-git clone https://github.com/KalEktor/PyHyb.git
-cd PyHyb
+---
+
+## 📐 Architecture
+
+```
+PyHyB/
+├── pyhyb/                     # Main package
+│   ├── core/                  # Workflow orchestration
+│   │   ├── runner.py          # Geni orchestrator & run_build_hybrid()
+│   │   ├── hybrid_runner.py   # HybridWorkflowRunner (validation + execution)
+│   │   └── main.py            # pyhyb_main() entry point
+│   ├── tools/                 # Builder & analysis tools
+│   │   ├── builder.py         # HybridBuilder, HybridConfig, build manifest
+│   │   ├── optimizer.py       # DFTB+ geometry optimisation
+│   │   ├── tools.py           # Segment analysis (local_mean, consistency)
+│   │   └── cross_tools.py     # Cross-segment (Pearson, overlap)
+│   ├── inout/                 # File I/O helpers
+│   │   └── inout.py           # Read .s/.f files, JSON settings
+│   ├── bin/                   # CLI entry points
+│   │   └── pyhybrun.py        # Console script
+│   └── info.py                # Version, logo, metadata
+├── tests/                     # Unit tests (34 tests)
+├── example/                   # Benchmark examples with data
+├── app.py                     # Streamlit Web GUI
+├── launcher.py                # Interactive menu launcher
+└── run.sh                     # One-click bootstrapper (macOS/Linux)
 ```
 
-### 2. Download as a ZIP File (For Non-Git Users)
-If you do not have Git installed on your computer:
-1. Navigate to the GitHub repository: [github.com/KalEktor/PyHyb](https://github.com/KalEktor/PyHyb).
-2. Click the green **Code** button at the top-right of the files panel.
-3. Select **Download ZIP** from the dropdown menu.
-4. Extract the downloaded ZIP archive on your computer and open a terminal inside the extracted directory.
-
-### 3. Install Directly via `pip` (For Library & CLI Users)
-If you only need to use the global `pyhyb` command-line executable or import the hybrid builder tools inside your own Python library scripts:
-```bash
-pip install git+https://github.com/KalEktor/PyHyb.git
-```
-
 ---
 
-## ⚡ Quick-Start (1-Click Universal Launcher)
+## 🚀 Installation
 
-PyHyB features an **automated, cross-platform bootstrapper** that checks for Python, installs it automatically if missing on your system, creates a virtual environment, installs the package, and opens a premium **Interactive 3D Web GUI** or runs tests and examples in one click.
+### Manual Install (recommended)
 
-### 🍎 On macOS & Linux:
-1. Open your terminal in the cloned repository folder.
-2. Run the launcher:
-   ```bash
-   ./run.sh
-   ```
-
-### 🔌 On Windows:
-1. Open your file explorer in the cloned repository folder.
-2. Double-click the launcher script at the root of the folder:
-   ```cmd
-   run.bat
-   ```
-
-> [!NOTE]
-   > **No Python? No problem!** Double-clicking `run.bat` (Windows) or running `./run.sh` (macOS/Linux) will automatically detect if a working Python 3 installation is missing, download the official installer, configure your system PATH, and set up your virtual environment cleanly in one click. (On Windows, this automatically bypasses the dummy Microsoft Store execution alias to ensure a real Python installation is completed).
-
-Once launched, an interactive terminal menu will let you choose to:
-* **Option 1**: Start the Interactive 3D Web GUI in your browser. 🚀
-* **Option 2**: Start the Custom Interactive Hybrid Builder. 🔨
-* **Option 3**: Run Example 1 (Glycine deposition on Graphene). 🧪
-* **Option 4**: Run Example 2 (Crown Ether deposition on Graphene). 🍩
-* **Option 5**: Run Example 3 (Cucurbituril deposition on Graphene Oxide). 🛡️
-* **Option 6**: Run the built-in Unit Tests to verify installation. 🧪
-* **Option 7**: Exit the launcher. 🚪
-
----
-
-## 🖥️ Application Interfaces
-
-### 1. Interactive 3D Web GUI (Streamlit)
-Launch the GUI via Option 1 in the 1-click launcher. It opens a clean, default-dark web portal in your browser:
-* **Drag-and-Drop Uploader**: Upload your `.xyz` macromolecule and `.cif` substrate.
-* **Interactive 3D Previews**: Rotate, zoom, and verify structures in real time.
-* **Parameter Sliders**: Easily adjust starting heights, collision thresholds, and COM rotation angles.
-* **Download Portal**: Download constructed hybrid structures in `.cif`, `.xyz`, or `.gen` format with one click.
-* **Benchmark Presets**: Instant load buttons to preview Glycine, Crown Ether, or Cucurbituril deposition.
-
-### 2. Command-Line Interface (CLI)
-
-PyHyB offers two ways to run from the command line:
-
-#### A. Global CLI Script (`pyhyb`)
-If you have installed the package via pip (`pip install -e .`), you can invoke the CLI globally:
 ```bash
-pyhyb -m material.xyz -s substrate.cif -o custom_output_folder --placement surface --distance 3.0 --rotation 90 0 180 --collision-threshold 1.5 --optimize -v
-```
-
-##### 🚩 Command-Line Arguments:
-*   **`-m / --material`**: Macromolecule filename in `input/` or a direct path (e.g., `material.xyz`).
-*   **`-s / --substrate`**: Periodic substrate filename in `input/` or a direct path (e.g., `substrate.cif`).
-*   **`-o / --outdir`**: Destination folder for output files (defaults to `output/`).
-*   **`--placement`**: Center molecule in unit cell (`center`) or place above substrate peak (`surface`). Defaults to `center`.
-*   **`--distance`**: Starting height above the surface in Ångströms (defaults to `3.0`).
-*   **`--rotation X Y Z`**: COM rotation angles in degrees (e.g., `--rotation 90 0 180`).
-*   **`--collision-threshold`**: Minimum allowed inter-atomic distance (defaults to `1.5 Å`).
-*   **`--optimize`**: Triggers the DFTB+ Geometric Optimization pipeline to relax the final structure.
-*   **`-v / --verbose`**: Enables detailed verbose logging.
-
-#### B. Launcher CLI Mode (`python launcher.py`)
-Alternatively, you can run directly via the launcher's non-interactive CLI by providing the required arguments:
-```bash
-python launcher.py -m example/data/glycine.xyz -s example/data/graphene_7x7.cif -o custom_output -p surface -d 3.0 -t 1.5 -r 90 0 180 --optimize
-```
-
-##### 🚩 Arguments:
-*   **`-m / --material`**: Path to macromolecule `.xyz` structure file.
-*   **`-s / --substrate`**: Path to periodic substrate `.cif` structure file.
-*   **`-o / --outdir`**: Output directory for generated structures (default: `output/`).
-*   **`-p / --placement`**: Macromolecule placement logic (`center` or `surface`, default: `center`).
-*   **`-d / --distance`**: Starting vertical separation distance in Å (default: `3.0`).
-*   **`-t / --threshold`**: Collision detection threshold in Å (default: `1.5`).
-*   **`-r / --rotation`**: 3D Euler rotation angles in degrees (e.g. `90 0 180`).
-*   **`--prefix`**: Filename prefix for generated structures (default: `hybrid_structure`).
-*   **`--optimize`**: Trigger DFTB+ geometric optimization of the combined structure.
-
----
-
-## 🛠️ Manual Installation & DFTB+ Setup
-
-If you prefer to configure your Python environment manually or wish to set up the **DFTB+ Geometric Optimizer**, follow these steps:
-
-### 1. Manual Package Installation
-Ensure you have Python 3.9+ installed, then:
-```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/KalEktor/PyHyb.git
 cd PyHyb
 
-# Install the package in editable mode
+# 2. Create a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install in editable mode
 pip install -e .
 ```
 
-### 2. DFTB+ Geometry Optimizer Setup (Optional)
-If you intend to run structural optimizations using the `--optimize` command-line flag:
+### One-Click Bootstrap (macOS / Linux)
+
+For users who prefer a single command that handles Python detection, virtual environment creation, and dependency installation:
+
 ```bash
-conda install -c conda-forge dftbplus
+chmod +x run.sh
+./run.sh
 ```
 
-To run the optimizer successfully, download and configure the Slater-Koster parameter files:
-1. Download the parameter dataset suitable for your elements (e.g., `mio`, `3ob`, or `pbc`) from [dftb.org](https://dftb.org/parameters/download).
-2. Extract the downloaded parameters archive.
-3. Configure the `DFTB_PREFIX` environment variable to point to the `skfiles/` directory containing the Slater-Koster parameters:
-   ```bash
-   export DFTB_PREFIX="/path/to/slater-koster-files/skfiles/"
-   ```
-   Add this export statement to your shell profile (e.g. `~/.bashrc` or `~/.zshrc`) to make it persistent.
+This will automatically detect/install Python, create a `.venv`, install dependencies, and launch the interactive menu.
 
 ---
 
-## 🧠 Underlying Workflow Operations
+## 🔬 Usage
 
-The builder executes the building sequence through the following physical workflow steps:
+### Python API (programmatic)
 
-```mermaid
-graph TD
-    A["Read XYZ Molecule & CIF Substrate"] --> B["Substrate Z-Unwrapping Check"]
-    B --> C["Wrap Substrate Atoms into X/Y unit-cell"]
-    C --> F["Apply User-Specified Rotation (Euler angles)"]
-    F --> G{"Does Molecule Fit in Cell?"}
-    G -->|No| H["Auto-Rotate/Tilt to Fit (In-Plane Yaw & Out-of-Plane Pitch/Roll)"]
-    G -->|Yes| I["Center Bounding Box in fractional X/Y space"]
-    H --> I
-    I --> J["Position Molecule vertically (Surface peak vs Cell Z-midpoint)"]
-    J --> K["Iterative Z-push Collision Avoidance (cdist threshold check)"]
-    K --> L["Combine Structures & Dynamic Z-Vacuum Expansion"]
-    L --> M{"DFTB+ Optimization Requested?"}
-    M -->|Yes| N["BFGS Geometry Relaxation (Slater-Koster energy minimization)"]
-    M -->|No| O["Write CIF, XYZ, and GEN Outputs (Pre-relaxed / Optimized)"]
-    N --> O
+```python
+from pyhyb.core.runner import run_build_hybrid
+
+# Build a glycine-on-graphene hybrid structure
+msg = run_build_hybrid(
+    material_path="example/data/glycine.xyz",
+    substrate_path="example/data/graphene_7x7.cif",
+    output_dir="output/glycine_on_graphene",
+    placement="surface",         # or "center"
+    distance=3.0,                # Å above substrate
+    collision_threshold=1.5,     # minimum allowed distance (Å)
+    rotation=[0, 0, 45],         # optional Euler angles (degrees)
+)
+print(msg)
+```
+
+### Interactive Menu
+
+```bash
+python launcher.py
+```
+
+Choose from: Web GUI launch, interactive builder, benchmark examples, or test suite.
+
+### CLI (non-interactive)
+
+```bash
+python launcher.py -m example/data/glycine.xyz \
+                   -s example/data/graphene_7x7.cif \
+                   -o output/ \
+                   -p surface \
+                   -d 3.0
+```
+
+### Streamlit Web GUI
+
+```bash
+streamlit run app.py
+```
+
+Opens a browser-based 3D dashboard for uploading structures, adjusting parameters, and visualising results interactively.
+
+### Jupyter Notebook Tutorial
+
+A step-by-step tutorial notebook is provided at `example/tutorial.ipynb`:
+
+```bash
+jupyter notebook example/tutorial.ipynb
+```
+
+The tutorial covers input inspection, building hybrids, tuning parameters, reading manifests, and using the advanced API.
+
+---
+
+## 📋 Build Manifest
+
+Every build produces a `*_manifest.json` alongside the output files for full experiment provenance:
+
+```json
+{
+  "timestamp": "2026-05-28T19:00:00+00:00",
+  "pyhyb_version": "0.0.9.dev0",
+  "git_sha": "abc1234",
+  "material_file": "glycine.xyz",
+  "substrate_file": "graphene_7x7.cif",
+  "placement": "surface",
+  "distance_angstrom": 3.0,
+  "collision_threshold_angstrom": 1.5,
+  "rotation_degrees": null,
+  "optimize": false,
+  "total_atoms": 108,
+  "cell_z_angstrom": 23.45
+}
 ```
 
 ---
 
-## 🚀 Verification Examples
+## 🧪 Examples
 
-Three benchmark verification configurations are provided inside the `example/` directory:
-1. **Example 1**: Depositing an amino acid (glycine) onto a periodic `7x7` graphene substrate.
-2. **Example 2**: Depositing a macrocycle (`15-crown-5` crown ether) onto a periodic `7x7` graphene substrate.
-3. **Example 3**: Depositing a large pumpkin-shaped cage host molecule (cucurbit[7]uril) onto a functionalized periodic `7x7` graphene oxide substrate.
+Three benchmark examples are included in `example/data/`:
 
-### Executing Examples
-Run the examples suite from the project root:
+| # | Material | Substrate | Description |
+|---|----------|-----------|-------------|
+| 1 | `glycine.xyz` | `graphene_7x7.cif` | Amino acid on pristine graphene |
+| 2 | `crown_ether.xyz` | `graphene_7x7.cif` | 15-crown-5 macrocycle on graphene |
+| 3 | `cucurbituril.xyz` | `graphene_oxide.cif` | CB[7] on graphene oxide |
+
+Run all examples:
+
 ```bash
 python example/run_examples.py
 ```
-Outputs are written directly to:
-* Example 1: `example/output/example1_glycine/`
-* Example 2: `example/output/example2_crown_ether/`
-* Example 3: `example/output/example3_cucurbituril/`
 
 ---
 
-## 🧪 Running Unit Tests & Quality Controls
+## ✅ Testing
 
-### 1. Execute Unit Tests
-Verify environment integrity using Python's built-in `unittest` suite:
-* **From the project root folder**:
-  ```bash
-  python -m unittest discover -s tests
-  ```
-* **From the `tests/` folder**:
-  ```bash
-  cd tests
-  python -m unittest discover
-  ```
-
-### 2. Code Quality
-We evaluate code rating compliance using `pylint`:
 ```bash
-pip install pylint
-pylint pyhyb
+# Run the full test suite (34 tests)
+python -m unittest discover -s tests -v
+
+# Or with pytest + coverage (if pytest is installed)
+python -m pytest tests/ -v --cov=pyhyb --cov-report=term-missing
 ```
+
+The test suite includes deterministic numerical tests for:
+- Collision avoidance Z-push increments
+- Auto-tilt (in-plane yaw and out-of-plane fallback)
+- Euler rotation application
+- Dynamic Z-vacuum cell expansion
+- Surface placement local vicinity
+- Cucurbituril channel alignment
+- Build manifest generation and validation
+
+---
+
+## 🛠️ Code Quality
+
+| Tool | Status |
+|------|--------|
+| **pylint** | 10.00/10 |
+| **pycodestyle** | 0 violations |
+| **Unit Tests** | 34/34 passing |
+
+CI runs all three checks on Python 3.10, 3.11, and 3.12 via GitHub Actions.
+
+---
+
+## ⚗️ Geometry Optimisation (DFTB+)
+
+To enable DFTB+ geometry optimisation, download the Slater-Koster parameter files from [dftb.org](https://dftb.org/parameters/download) matching your elements, and set:
+
+```bash
+export DFTB_PREFIX=/path/to/slater-koster-files/
+```
+
+Then use `--optimize` on the CLI or tick the option in the GUI.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Fork** the repository and create a feature branch
+2. **Write tests** for new functionality (see `tests/` for patterns)
+3. **Ensure all checks pass** before submitting:
+   ```bash
+   pylint pyhyb app.py launcher.py setup.py tests/
+   pycodestyle pyhyb/ tests/ app.py launcher.py setup.py
+   python -m unittest discover -s tests -v
+   ```
+4. Submit a **pull request** with a clear description of changes
+
+---
+
+## 📜 License
+
+Distributed under the LGPLv2.1+ License. See `LICENSE` for details.
+
+---
+
+## 📚 Dependencies
+
+- [ASE](https://wiki.fysik.dtu.dk/ase/) ≥ 3.22.0 — Atomic Simulation Environment
+- [NumPy](https://numpy.org/) ≥ 1.17.0 — Numerical computing
+- [SciPy](https://scipy.org/) ≥ 1.7.0 — Scientific computing
+- [Streamlit](https://streamlit.io/) ≥ 1.20.0 — Web GUI framework

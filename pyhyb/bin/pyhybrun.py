@@ -2,26 +2,29 @@
 # Copyright (c) 2024, Enrico Development Team.
 # Distributed under the LGPLv2.1+ License.
 """
-Program Callable
+PyHyB CLI entry point.
 
+Provides the ``pyhyb`` console script installed via pip.
+Supports both JSON-driven simulation mode (``-i``) and
+direct hybrid-building mode (``-m`` / ``-s``).
 """
 import argparse
 import datetime
 import logging
 from pathlib import Path
 import sys
+
 from pyhyb.core.main import pyhyb_main
 from pyhyb.core.hybrid_runner import HybridWorkflowRunner
 from pyhyb.info import PROGRAM_NAME, LOGO
+from pyhyb.tools.builder import HybridConfig
 
 _DATE_FMT = '%d.%m.%Y %H:%M:%S'
+_DEFAULTS = HybridConfig.defaults()
 
 
 def hello_world():
-    """
-    Greets.
-
-    """
+    """Print the startup banner with version and time."""
     timestart = datetime.datetime.now().strftime(_DATE_FMT)
     pyversion = sys.version.split()[0]
     print('\n'.join([LOGO]))
@@ -30,80 +33,102 @@ def hello_world():
 
 
 def parse_args():  # pragma: no cover
-    """
-    Reads arguments.
+    """Parse command-line arguments.
 
+    Returns:
+        argparse.Namespace: The parsed arguments.
     """
-    parser = argparse.ArgumentParser(description=PROGRAM_NAME)
-    parser.add_argument('-i', '--input',
-                        help=f'Location of {PROGRAM_NAME} input file',
-                        required=False, default=None)
-    parser.add_argument('-f', '--fuckers',
-                        help='Randomly insult a user',
-                        required=False, default='Fuck off')
-    parser.add_argument('-m', '--material',
-                        help='Path to material .xyz file for building hybrid structure',
-                        required=False, default=None)
-    parser.add_argument('-s', '--substrate',
-                        help='Path to substrate .cif file for building hybrid structure',
-                        required=False, default=None)
-    parser.add_argument('-o', '--outdir',
-                        help='Output directory (defaults to PyHyb/output)',
-                        required=False, default=None)
-    parser.add_argument('--placement',
-                        choices=['center', 'surface'],
-                        default='center',
-                        help='Placement logic (center or surface)')
-    parser.add_argument('--distance',
-                        type=float,
-                        default=3.0,
-                        help='Distance above substrate for surface placement')
-    parser.add_argument('--collision-threshold',
-                        type=float,
-                        default=1.5,
-                        help='Minimum allowed distance (Å) to detect collisions')
-    parser.add_argument('--rotation',
-                        type=float,
-                        nargs=3,
-                        metavar=('X', 'Y', 'Z'),
-                        help='Rotation angles around center of mass (degrees) for X, Y, and Z')
-    parser.add_argument('-v', '--verbose',
-                        action='store_true',
-                        help='Enable verbose logging')
-    parser.add_argument('--optimize',
-                        action='store_true',
-                        help='Geometrically optimize the final structure using DFT placeholder')
+    parser = argparse.ArgumentParser(
+        description=PROGRAM_NAME
+    )
+    parser.add_argument(
+        '-i', '--input',
+        help=f'Location of {PROGRAM_NAME} input file',
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        '-m', '--material',
+        help='Path to material .xyz file',
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        '-s', '--substrate',
+        help='Path to substrate .cif file',
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        '-o', '--outdir',
+        help='Output directory (defaults to PyHyb/output)',
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        '--placement',
+        choices=['center', 'surface'],
+        default=_DEFAULTS['placement'],
+        help='Placement logic (center or surface)',
+    )
+    parser.add_argument(
+        '--distance',
+        type=float,
+        default=_DEFAULTS['distance'],
+        help='Distance above substrate for surface '
+             'placement (Å)',
+    )
+    parser.add_argument(
+        '--collision-threshold',
+        type=float,
+        default=_DEFAULTS['collision_threshold'],
+        help='Minimum allowed distance (Å)',
+    )
+    parser.add_argument(
+        '--rotation',
+        type=float,
+        nargs=3,
+        metavar=('X', 'Y', 'Z'),
+        help='Rotation angles around COM (degrees)',
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Enable verbose logging',
+    )
+    parser.add_argument(
+        '--optimize',
+        action='store_true',
+        help='Geometrically optimize using DFTB+',
+    )
     return parser.parse_args()
 
 
 def bye_world():
-    """
-    Greets.
-
-    """
+    """Print the shutdown banner."""
     timeend = datetime.datetime.now().strftime(_DATE_FMT)
     print(f'End of {PROGRAM_NAME} execution: {timeend}')
 
 
 def entry_point():  # pragma: no cover
-    """
-    Connects executable to main program.
-
-    """
+    """Connect the console script to the main programme."""
     hello_world()
     args = parse_args()
 
     if args.input:
         pyhyb_main(args.input)
     elif args.material and args.substrate:
-        # Setup paths relative to the package root
-        base_dir = Path(__file__).resolve().parent.parent.parent
+        base_dir = (
+            Path(__file__).resolve().parent.parent.parent
+        )
         input_dir = base_dir / "input"
         output_dir = base_dir / "output"
 
-        outdir = args.outdir if args.outdir else str(output_dir)
+        outdir = (
+            args.outdir if args.outdir
+            else str(output_dir)
+        )
 
-        # Check if the inputs are files in the input folder
         mat_path = Path(args.material)
         sub_path = Path(args.substrate)
 
@@ -112,8 +137,13 @@ def entry_point():  # pragma: no cover
         if not sub_path.is_absolute() and not sub_path.exists():
             sub_path = input_dir / sub_path.name
 
-        log_level = logging.DEBUG if args.verbose else logging.INFO
-        runner = HybridWorkflowRunner(log_level=log_level)
+        log_level = (
+            logging.DEBUG if args.verbose
+            else logging.INFO
+        )
+        runner = HybridWorkflowRunner(
+            log_level=log_level
+        )
         runner.run(
             material_path=str(mat_path),
             substrate_path=str(sub_path),
@@ -122,10 +152,13 @@ def entry_point():  # pragma: no cover
             distance=args.distance,
             collision_threshold=args.collision_threshold,
             rotation=args.rotation,
-            optimize=args.optimize
+            optimize=args.optimize,
         )
     else:
-        print("Please provide either -i for simulation or both -m and -s for hybrid building.")
+        print(
+            "Please provide either -i for simulation "
+            "or both -m and -s for hybrid building."
+        )
 
     bye_world()
 

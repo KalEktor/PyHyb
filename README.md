@@ -41,7 +41,7 @@ PyHyB/
 │   ├── bin/                   # CLI entry points
 │   │   └── pyhybrun.py        # Console script
 │   └── info.py                # Version, logo, metadata
-├── tests/                     # Unit tests (34 tests)
+├── tests/                     # Unit + integration tests (40 tests)
 ├── example/                   # Benchmark examples with data
 ├── app.py                     # Streamlit Web GUI
 ├── launcher.py                # Interactive menu launcher
@@ -252,3 +252,16 @@ Distributed under the LGPLv2.1+ License. See `LICENSE` for details.
 - [NumPy](https://numpy.org/) ≥ 1.17.0 — Numerical computing
 - [SciPy](https://scipy.org/) ≥ 1.7.0 — Scientific computing
 - [Streamlit](https://streamlit.io/) ≥ 1.20.0 — Web GUI framework
+
+---
+
+## 📖 API Documentation
+
+Full API reference is auto-generated from docstrings using Sphinx:
+
+```bash
+pip install -e .[docs]
+cd docs && make html
+```
+
+The generated HTML will be in `docs/_build/html/`.

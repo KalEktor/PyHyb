@@ -48,12 +48,17 @@ dev = [
     "pytest",
     "pytest-cov",
 ]
+docs = [
+    "sphinx",
+    "sphinx-autodoc-typehints",
+]
 
 [project.scripts]
 pyhyb = "pyhyb.bin.pyhybrun:entry_point"
 
 [project.urls]
 Homepage = "https://github.com/KalEktor/PyHyb"
+Documentation = "https://kalektro.github.io/PyHyb/"
 Repository = "https://github.com/KalEktor/PyHyb"
 Issues = "https://github.com/KalEktor/PyHyb/issues"
 

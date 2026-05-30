@@ -740,6 +740,7 @@ class TestBuilder(unittest.TestCase):
             "optimize",
             "total_atoms",
             "cell_z_angstrom",
+            "build_decisions",
         ]
         for key in required_keys:
             self.assertIn(key, manifest)
@@ -758,6 +759,14 @@ class TestBuilder(unittest.TestCase):
         )
         self.assertEqual(
             manifest["total_atoms"], len(hybrid)
+        )
+
+        # Build decisions should be a non-empty list
+        decisions = manifest["build_decisions"]
+        self.assertIsInstance(decisions, list)
+        self.assertGreater(
+            len(decisions), 0,
+            "Manifest should capture build decisions",
         )
 
     # --------------------------------------------------

@@ -26,6 +26,54 @@ from ase.io import read, write
 from scipy.spatial.distance import cdist
 
 
+class _BuildLog:
+    """In-memory log handler for capturing build decisions.
+
+    Attaches to the builder logger during a build and stores
+    each message as a string.  The captured entries are later
+    written into the build manifest so that algorithmic
+    decisions are available offline.
+
+    Usage::
+
+        log = _BuildLog()
+        log.attach()
+        # ... build ...
+        log.detach()
+        entries = log.entries   # list[str]
+    """
+
+    def __init__(self) -> None:
+        self.entries: list[str] = []
+        self._handler = logging.Handler()
+        self._handler.emit = self._emit  # type: ignore[assignment]
+        self._handler.setLevel(logging.DEBUG)
+        self._prev_level: int | None = None
+
+    def _emit(self, record: logging.LogRecord) -> None:
+        """Store formatted log record."""
+        self.entries.append(
+            self._handler.format(record)
+        )
+
+    def attach(self) -> None:
+        """Attach handler to the builder logger.
+
+        Ensures the logger level is at least INFO so
+        that build-decision messages pass through.
+        """
+        self._prev_level = logger.level
+        if logger.level > logging.INFO or logger.level == 0:
+            logger.setLevel(logging.INFO)
+        logger.addHandler(self._handler)
+
+    def detach(self) -> None:
+        """Detach handler and restore previous log level."""
+        logger.removeHandler(self._handler)
+        if self._prev_level is not None:
+            logger.setLevel(self._prev_level)
+
+
 class BuildHybridError(Exception):
     """Base exception for builder failures."""
 
@@ -122,6 +170,7 @@ class HybridBuilder:
                 the build parameters.
         """
         self.config = config
+        self._build_log = _BuildLog()
         self._validate_inputs()
 
     def _validate_inputs(self) -> None:
@@ -545,6 +594,23 @@ class HybridBuilder:
     def build(self) -> Atoms:
         """Execute the build process.
 
+        Build decisions are captured in an internal log that
+        is later written to the manifest via
+        :meth:`write_manifest`.
+
+        Returns:
+            The final hybrid :class:`~ase.Atoms` structure.
+        """
+        self._build_log = _BuildLog()
+        self._build_log.attach()
+        try:
+            return self._build_inner()
+        finally:
+            self._build_log.detach()
+
+    def _build_inner(self) -> Atoms:
+        """Internal build logic (called within log capture).
+
         Returns:
             The final hybrid :class:`~ase.Atoms` structure.
         """
@@ -666,6 +732,9 @@ class HybridBuilder:
             "optimize": self.config.optimize,
             "total_atoms": len(hybrid),
             "cell_z_angstrom": float(hybrid.cell[2, 2]),
+            "build_decisions": (
+                list(self._build_log.entries)
+            ),
         }
 
         prefix = self._get_output_prefix()
